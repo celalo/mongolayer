@@ -727,7 +727,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 	}
 
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.beforeHooks || self.defaultHooks.update);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
 
