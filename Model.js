@@ -452,7 +452,7 @@ Model.prototype.insert = function(docs, options, cb) {
 	// ensure docs is always an array
 	docs = docs instanceof Array ? docs : [docs];
 
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.insert);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.insert, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
 
@@ -530,7 +530,7 @@ Model.prototype.save = function(doc, options, cb) {
 
 	// if options is callback, default the options
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.save);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.save, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
 
@@ -608,7 +608,7 @@ Model.prototype.find = function(filter, options, cb) {
 	}
 
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.find);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.find, options.hookArgs);
 	options.castDocs = options.castDocs !== undefined ? options.castDocs : true;
 	options.fields = options.fields || null;
 	options.options = options.options || {};
@@ -695,7 +695,7 @@ Model.prototype.count = function(filter, options, cb) {
 	}
 
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.count);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.count, options.hookArgs);
 	options.options = options.options || {};
 
 	self._executeHooks({ type : "beforeCount", hooks : self._getHooksByType("beforeCount", options.hooks), args : { filter : filter, options : options } }, function(err, args) {
@@ -727,7 +727,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 	}
 
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
 
@@ -797,7 +797,7 @@ Model.prototype.remove = function(filter, options, cb) {
 	}
 
 	options = options === cb ? {} : options;
-	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.remove);
+	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.remove, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
 
@@ -968,14 +968,16 @@ Model.prototype._getHooksByType = function(type, hooks) {
 	});
 }
 
-Model.prototype._normalizeHooks = function(hooks, cb) {
+Model.prototype._normalizeHooks = function(hooks, hookArgs) {
 	var self = this;
 
 	// args.hooks
 
 	var newHooks = [];
 	hooks.forEach(function(val, i) {
-		newHooks.push(typeof val === "string" ? { name : val } : val);
+		hook = typeof val === "string" ? { name : val } : val
+		hook.args = extend(true, hook.args || {}, hookArgs);
+		newHooks.push(hook);
 	});
 
 	return newHooks;
@@ -1008,7 +1010,7 @@ Model.prototype._executeHooks = function(args, cb) {
 
 	objectLib.forEach(self.hooks[args.type], function(val, i) {
 		if (hookIndex[i] === undefined && val.required === true) {
-			hooks.push({ hook : val, requestedHook : { name : i } });
+			hooks.push({ hook : val, requestedHook : { name : i, args: args.args.options.hookArgs } });
 		}
 	});
 
