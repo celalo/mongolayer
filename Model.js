@@ -601,6 +601,26 @@ Model.prototype.aggregate = function(pipeline, options, cb) {
 	});
 }
 
+Model.prototype.findOne = function(filter, options, cb) {
+	var self = this;
+
+	cb = cb || options;
+	options = options === cb ? {} : options;
+	callerArgs = arguments.callee.caller.arguments;
+	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
+		options.hookArgs = {
+			req: callerArgs[0],
+			res: callerArgs[1]
+		};
+	}
+
+	self.find(filter, options, function(err, docs) {
+		if (err) { return cb(err); }
+
+		cb(null, docs.length === 0 ? null : docs[0]);
+	});
+}
+
 Model.prototype.findById = function(id, options, cb) {
 	var self = this;
 
