@@ -565,7 +565,7 @@ Model.prototype.save = function(doc, options, cb) {
 	// if options is callback, default the options
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.save, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -627,7 +627,7 @@ Model.prototype.findOne = function(filter, options, cb) {
 	cb = cb || options;
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 
 	self.find(filter, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -642,7 +642,7 @@ Model.prototype.findById = function(id, options, cb) {
 	cb = cb || options;
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 
 	self.find({ _id : id instanceof mongolayer.ObjectId ? id : new mongolayer.ObjectId(id) }, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -663,7 +663,7 @@ Model.prototype.find = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.find, options.hookArgs);
 	options.castDocs = options.castDocs !== undefined ? options.castDocs : true;
 	options.fields = options.fields || null;
@@ -752,7 +752,7 @@ Model.prototype.count = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.count, options.hookArgs);
 	options.options = options.options || {};
 
@@ -786,7 +786,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -858,7 +858,7 @@ Model.prototype.remove = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.remove, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
