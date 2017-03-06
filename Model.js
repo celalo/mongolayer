@@ -15,6 +15,32 @@ var queryLogMock = {
 	send : function() {}
 }
 
+// getDefaultHookArgs = (funcArgs) ->
+//   callerArgs = funcArgs?.callee?.caller?.arguments
+//   if callerArgs.length is 3 and callerArgs?[0]?.method?
+//     req: callerArgs[0]
+//     res: callerArgs[1]
+//   else
+//     callerArgs = funcArgs?.callee?.caller?.caller?.caller?.arguments
+//     if callerArgs?[1]?.hookArgs?.req?
+//       callerArgs[1].hookArgs
+var getDefaultHookArgs = function(funcArgs) {
+  var callerArgs, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8;
+  callerArgs = funcArgs != null ? (ref = funcArgs.callee) != null ? (ref1 = ref.caller) != null ? ref1["arguments"] : void 0 : void 0 : void 0;
+  if (callerArgs.length === 3 && ((callerArgs != null ? (ref2 = callerArgs[0]) != null ? ref2.method : void 0 : void 0) != null)) {
+    return {
+      req: callerArgs[0],
+      res: callerArgs[1]
+    };
+  } else {
+    callerArgs = funcArgs != null ? (ref3 = funcArgs.callee) != null ? (ref4 = ref3.caller) != null ? (ref5 = ref4.caller) != null ? (ref6 = ref5.caller) != null ? ref6["arguments"] : void 0 : void 0 : void 0 : void 0 : void 0;
+    if ((callerArgs != null ? (ref7 = callerArgs[1]) != null ? (ref8 = ref7.hookArgs) != null ? ref8.req : void 0 : void 0 : void 0) != null) {
+      return callerArgs[1].hookArgs;
+    }
+  }
+};
+
+
 var Model = function(args) {
 	var self = this;
 
@@ -539,13 +565,7 @@ Model.prototype.save = function(doc, options, cb) {
 	// if options is callback, default the options
 	options = options === cb ? {} : options;
 
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+	options.hookArgs = getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.save, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -606,13 +626,8 @@ Model.prototype.findOne = function(filter, options, cb) {
 
 	cb = cb || options;
 	options = options === cb ? {} : options;
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+
+	options.hookArgs = getDefaultHookArgs(arguments);
 
 	self.find(filter, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -626,13 +641,8 @@ Model.prototype.findById = function(id, options, cb) {
 
 	cb = cb || options;
 	options = options === cb ? {} : options;
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+
+	options.hookArgs = getDefaultHookArgs(arguments);
 
 	self.find({ _id : id instanceof mongolayer.ObjectId ? id : new mongolayer.ObjectId(id) }, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -642,6 +652,7 @@ Model.prototype.findById = function(id, options, cb) {
 }
 
 Model.prototype.find = function(filter, options, cb) {
+
 	var self = this;
 
 	cb = cb || options;
@@ -652,13 +663,7 @@ Model.prototype.find = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+	options.hookArgs = getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.find, options.hookArgs);
 	options.castDocs = options.castDocs !== undefined ? options.castDocs : true;
 	options.fields = options.fields || null;
@@ -747,13 +752,7 @@ Model.prototype.count = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+	options.hookArgs = getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.count, options.hookArgs);
 	options.options = options.options || {};
 
@@ -787,13 +786,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+	options.hookArgs = getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -865,13 +858,7 @@ Model.prototype.remove = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	callerArgs = arguments.callee.caller.arguments;
-	if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-		options.hookArgs = {
-			req: callerArgs[0],
-			res: callerArgs[1]
-		};
-	}
+	options.hookArgs = getDefaultHookArgs(arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.remove, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
