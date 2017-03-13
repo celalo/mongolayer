@@ -796,7 +796,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 	self._executeHooks({ type : "beforeUpdate", hooks : self._getHooksByType("beforeUpdate", options.hooks), args : { filter : filter, delta: delta, options : options } }, function(err, args) {
 		if (err) { return cb(err); }
 
-		self._executeHooks({ type : "beforeFilter", hooks : self._getHooksByType("beforeFind", options.hooks), args : { filter : filter, options : options } }, function(err, tempArgs) {
+		self._executeHooks({ type : "beforeFilter", hooks : self._getHooksByType("beforeFilter", options.hooks), args : { filter : filter, options : options } }, function(err, tempArgs) {
 			if (err) { return cb(err); }
 
 			var calls = [];
