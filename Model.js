@@ -15,22 +15,24 @@ var queryLogMock = {
 	send : function() {}
 }
 
-// getDefaultHookArgs = (funcArgs) ->
+// getDefaultHookArgs = (self, funcArgs) ->
 //   callerArgs = funcArgs?.callee?.caller?.arguments
 //   if callerArgs.length is 3 and callerArgs?[0]?.method?
 //     req: callerArgs[0]
 //     res: callerArgs[1]
+//     model: self.collectionName
 //   else
 //     callerArgs = funcArgs?.callee?.caller?.caller?.caller?.arguments
 //     if callerArgs?[1]?.hookArgs?.req?
 //       callerArgs[1].hookArgs
-var getDefaultHookArgs = function(funcArgs) {
+var getDefaultHookArgs = function(self, funcArgs) {
   var callerArgs, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8;
   callerArgs = funcArgs != null ? (ref = funcArgs.callee) != null ? (ref1 = ref.caller) != null ? ref1["arguments"] : void 0 : void 0 : void 0;
   if (callerArgs.length === 3 && ((callerArgs != null ? (ref2 = callerArgs[0]) != null ? ref2.method : void 0 : void 0) != null)) {
     return {
       req: callerArgs[0],
-      res: callerArgs[1]
+      res: callerArgs[1],
+      model: self.collectionName
     };
   } else {
     callerArgs = funcArgs != null ? (ref3 = funcArgs.callee) != null ? (ref4 = ref3.caller) != null ? (ref5 = ref4.caller) != null ? (ref6 = ref5.caller) != null ? ref6["arguments"] : void 0 : void 0 : void 0 : void 0 : void 0;
