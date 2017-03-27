@@ -17,7 +17,7 @@ var queryLogMock = {
 
 // getDefaultHookArgs = (self, funcArgs) ->
 //   callerArgs = funcArgs?.callee?.caller?.arguments
-//   if callerArgs.length is 3 and callerArgs?[0]?.method?
+//   if callerArgs?.length is 3 and callerArgs?[0]?.method?
 //     req: callerArgs[0]
 //     res: callerArgs[1]
 //     model: self.collectionName
@@ -28,7 +28,7 @@ var queryLogMock = {
 var getDefaultHookArgs = function(self, funcArgs) {
   var callerArgs, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8;
   callerArgs = funcArgs != null ? (ref = funcArgs.callee) != null ? (ref1 = ref.caller) != null ? ref1["arguments"] : void 0 : void 0 : void 0;
-  if (callerArgs.length === 3 && ((callerArgs != null ? (ref2 = callerArgs[0]) != null ? ref2.method : void 0 : void 0) != null)) {
+  if ((callerArgs != null ? callerArgs.length : void 0) === 3 && ((callerArgs != null ? (ref2 = callerArgs[0]) != null ? ref2.method : void 0 : void 0) != null)) {
     return {
       req: callerArgs[0],
       res: callerArgs[1],
@@ -569,7 +569,7 @@ Model.prototype.save = function(doc, options, cb) {
 	// if options is callback, default the options
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.save, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -631,7 +631,7 @@ Model.prototype.findOne = function(filter, options, cb) {
 	cb = cb || options;
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 
 	self.find(filter, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -646,7 +646,7 @@ Model.prototype.findById = function(id, options, cb) {
 	cb = cb || options;
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 
 	self.find({ _id : id instanceof mongolayer.ObjectId ? id : new mongolayer.ObjectId(id) }, options, function(err, docs) {
 		if (err) { return cb(err); }
@@ -667,7 +667,7 @@ Model.prototype.find = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.find, options.hookArgs);
 	options.castDocs = options.castDocs !== undefined ? options.castDocs : true;
 	options.fields = options.fields || null;
@@ -756,7 +756,7 @@ Model.prototype.count = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.count, options.hookArgs);
 	options.options = options.options || {};
 
@@ -790,7 +790,7 @@ Model.prototype.update = function(filter, delta, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.update, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
@@ -862,7 +862,7 @@ Model.prototype.remove = function(filter, options, cb) {
 
 	options = options === cb ? {} : options;
 
-	options.hookArgs = options.hookArgs || getDefaultHookArgs(arguments);
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.remove, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
