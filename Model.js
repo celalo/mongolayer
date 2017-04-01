@@ -139,13 +139,13 @@ var Model = function(args) {
 	});
 
 	// adds id string alias
-	self.addVirtual({
-		name : "id",
-		type : "idToString",
-		options : {
-			key : "_id"
-		}
-	});
+	// self.addVirtual({
+	// 	name : "id",
+	// 	type : "idToString",
+	// 	options : {
+	// 		key : "_id"
+	// 	}
+	// });
 
 	// adds storage for core functionality in case we need this in the future
 	self.addField({
