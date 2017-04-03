@@ -483,13 +483,7 @@ Model.prototype.insert = function(docs, options, cb) {
 	docs = docs instanceof Array ? docs : [docs];
 
 
-		callerArgs = arguments.callee.caller.arguments;
-		if(typeof callerArgs !== "undefined" && callerArgs !== null && callerArgs.length == 3 && callerArgs[0].method) {
-			options.hookArgs = {
-				req: callerArgs[0],
-				res: callerArgs[1]
-			};
-		}
+	options.hookArgs = options.hookArgs || getDefaultHookArgs(self, arguments);
 	options.hooks = self._normalizeHooks(options.hooks || self.defaultHooks.insert, options.hookArgs);
 	options.options = options.options || {};
 	options.options.fullResult = true; // this option needed by mongolayer, but we wash it away so the downstream result is the same
